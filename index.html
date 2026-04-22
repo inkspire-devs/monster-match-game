@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monster Match</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Inter:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        
+        <div id="setup-screen">
+            <h2>Monster Match</h2>
+            <div id="tag-clouds">
+                </div>
+        </div>
+
+        <div id="swipe-screen" style="display:none;">
+            <div id="match-counter" class="card-tier" style="margin-bottom: 10px;">MATCH: 0 / 0</div>
+
+            <div id="monster-card">
+                <img id="card-image" src="" alt="Monster Profile Image">
+                <div id="card-content"></div>
+                <div id="card-profile"></div>
+
+                <div class="swipe-btns">
+                    <button onclick="resetGame()" class="btn-no" id="redo-btn">Re-do</button>
+                    <button onclick="prevCard()" class="btn-no" id="back-btn">Back</button>
+                    <button onclick="nextCard()" class="btn-no">Pass</button>
+                    <button onclick="triggerEmailWall()" class="btn-yes">Connect</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="email-wall" style="display:none;">
+            <h2>The Invitation is Ready...</h2>
+            <p>Where should we send the details of your encounter?</p>
+            <input type="email" id="user-email" placeholder="your@email.com">
+            <div class="legal">
+                <input type="checkbox" id="marketing-check"> 
+                <span>I agree to receive spicy updates and ebook news.</span>
+            </div>
+            <button id="reveal-btn" onclick="showFinalResult()">Reveal My Fate</button>
+        </div>
+
+        <div id="final-result" style="display:none;"></div>
+        
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
