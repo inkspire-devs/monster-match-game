@@ -293,36 +293,34 @@ function triggerEmailWall() {
     document.getElementById('email-wall').style.display = 'block';
 }
 
-function showFinalResult() {
-    const email = document.getElementById('user-email').value;
+function showFinalResult(isSkip = false) {
+    const emailInput = document.getElementById('user-email');
+    const email = emailInput.value;
     const consent = document.getElementById('marketing-check').checked;
     const winner = matchedMonsters[currentCardIndex];
 
-    if (!email.includes("@") || !consent) {
-        alert("Please provide a valid email and consent to continue.");
-        return;
+    // If it's NOT a skip, we validate the email
+    if (!isSkip) {
+        if (!email.includes("@") || !consent) {
+            alert("ACCESS DENIED: Valid email and consent required for dossier decryption.");
+            return;
+        }
+
+        // Send to Wix
+        const payload = {
+            email: email,
+            monster: winner.name,
+            source: "MonsterMatchGame"
+        };
+        window.parent.postMessage(payload, "*");
     }
 
-    // Prepare the data for Wix
-    const payload = {
-        email: email,
-        monster: winner.name,
-        source: "MonsterMatchGame"
-    };
-
-    // Send to Wix parent page
-    window.parent.postMessage(payload, "*");
-
-    // Show the result screen to the user
+    // UI Transition remains the same
     document.getElementById('email-wall').style.display = 'none';
-    document.getElementById('final-result').style.display = 'block';
-    document.getElementById('final-result').innerHTML = `
-        <h2>Encounter Arranged!</h2>
-        <hr>
-        <h1>Meet ${winner.name}</h1>
-        <p>${winner.desc}</p>
-        <button class="tag-btn" onclick="location.reload()">Start Over</button>
-    `;
+    document.getElementById('dossier-monster-name').innerText = winner.name;
+    document.getElementById('dossier-species').innerText = `SPECIES: ${winner.species}`;
+    document.getElementById('dossier-paragraph').innerText = winner.encounterText;
+    document.getElementById('dossier-screen').style.display = 'block';
 }
 
 function prevCard() {
