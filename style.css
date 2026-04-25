@@ -324,6 +324,18 @@ h2 { font-size: 1.8rem; margin-bottom: 2rem; }
 }
 
 /* --- 7. FORMS & UTILITY --- */
+.lore-desc {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    font-style: italic;
+    color: var(--alabaster-grey);
+    background: rgba(193, 161, 101, 0.1); /* Very faint Acid Gold tint */
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(193, 161, 101, 0.2);
+}
+
 input[type="email"] {
     font-family: var(--data-font);
     width: 85%;
@@ -344,6 +356,18 @@ input[type="email"] {
     justify-content: center;
     gap: 10px;
     margin-bottom: 15px;
+}
+
+.dossier-text-box {
+    background: rgba(0, 0, 0, 0.4);
+    border-left: 2px solid var(--acid-gold);
+    padding: 20px;
+    margin: 15px 0;
+    text-align: left;
+    line-height: 1.6;
+    font-family: 'Courier New', Courier, monospace; /* Optional for that lab vibe */
+    font-size: 0.9rem;
+    color: var(--alabaster-grey);
 }
 
 button:active { transform: scale(0.98); }
