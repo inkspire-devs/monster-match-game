@@ -328,7 +328,7 @@ function showFinalResult(isSkip = false) {
     document.getElementById('dossier-monster-name').innerText = winner.name;
     document.getElementById('dossier-species').innerText = `SPECIES: ${winner.species}`;
     document.getElementById('dossier-paragraph').innerText = winner.encounterText;
-    document.getElementById('dossier-screen').style.display = 'block';
+    document.getElementById('dossier-screen').style.display = 'none';
     sendHeightToWix();
 }
 
