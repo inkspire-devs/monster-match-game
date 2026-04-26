@@ -329,11 +329,22 @@ h2 { font-size: 1.8rem; margin-bottom: 2rem; }
     line-height: 1.4;
     font-style: italic;
     color: var(--alabaster-grey);
-    background: rgba(193, 161, 101, 0.1); /* Very faint Acid Gold tint */
+    background: rgba(193, 161, 101, 0.1); 
     padding: 10px;
     border-radius: 4px;
     margin-bottom: 20px;
     border: 1px solid rgba(193, 161, 101, 0.2);
+}
+
+.lore-header {
+    display: block;
+    font-family: var(--header-font); 
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    margin-bottom: 10px;
+    color: var(--acid-gold);
 }
 
 input[type="email"] {
@@ -365,7 +376,7 @@ input[type="email"] {
     margin: 15px 0;
     text-align: left;
     line-height: 1.6;
-    font-family: 'Courier New', Courier, monospace; /* Optional for that lab vibe */
+    font-family: 'Courier New', Courier, monospace; 
     font-size: 0.9rem;
     color: var(--alabaster-grey);
 }
@@ -375,19 +386,19 @@ button:active { transform: scale(0.98); }
 /* --- 8. MOBILE OPTIMIZATION --- */
 @media screen and (max-width: 480px) {
     #game-container {
-        width: 95%; /* Use more of the screen width */
-        padding: 1.2rem; /* Reduce padding so content has room */
+        width: 95%; 
+        padding: 1.2rem; 
         margin: 5px auto;
     }
 
     h2 {
-        font-size: 1.4rem; /* Smaller headers so they don't wrap weirdly */
+        font-size: 1.4rem; 
         margin-bottom: 1.5rem;
     }
 
     /* Stack the header grid for monsters */
     .card-header-grid {
-        grid-template-columns: 1fr; /* Stack name above metadata */
+        grid-template-columns: 1fr; 
         text-align: center;
         gap: 10px;
     }
@@ -399,27 +410,27 @@ button:active { transform: scale(0.98); }
 
     /* Make buttons larger for thumbs */
     .tag-btn {
-        width: 100%; /* Full width tags are easier to tap on mobile */
+        width: 100%;
         padding: 14px;
         font-size: 0.9rem;
     }
 
     .split-grid {
-        grid-template-columns: 1fr; /* Stack 'Looking For' and 'Expect' */
+        grid-template-columns: 1fr; 
         gap: 15px;
     }
 
     .swipe-btns {
-        flex-wrap: wrap; /* Allow buttons to wrap if they are too wide */
+        flex-wrap: wrap;
     }
 
     .swipe-btns button {
-        font-size: 0.75rem; /* Ensure 4 buttons fit side-by-side */
+        font-size: 0.75rem; 
         padding: 15px 2px;
     }
 
     input[type="email"] {
-        width: 100%; /* Full width email input */
+        width: 100%;
         box-sizing: border-box;
     }
 }
