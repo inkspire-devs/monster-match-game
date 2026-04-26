@@ -54,7 +54,6 @@ let currentCardIndex = 0;
 let currentPage = 0;
 
 function sendHeightToWix() {
-    // Adding a 40px buffer to ensure scrollbars never appear
     const height = document.documentElement.scrollHeight + 40;
     window.parent.postMessage({ frameHeight: height }, "*");
 }
@@ -98,7 +97,6 @@ function renderPage() {
     navContainer.appendChild(actionBtn);
     container.appendChild(navContainer);
     
-    // UI is rendered, sync height
     setTimeout(sendHeightToWix, 100);
 }
 
@@ -165,7 +163,6 @@ function resetGame() {
     matchedMonsters = [];
     currentCardIndex = 0;
     
-    // Reset all screens
     document.getElementById('swipe-screen').style.display = 'none';
     document.getElementById('email-wall').style.display = 'none';
     document.getElementById('dossier-screen').style.display = 'none';
@@ -225,7 +222,7 @@ function startSwiping() {
 
     // 4. Handle Empty Results
     if (matchedMonsters.length === 0) {
-        alert("DATABASE EMPTY: No entity matches that specific combination of parameters. Broaden your search.");
+        alert("No entity matches that specific combination of parameters. Broaden your search.");
         return; 
     }
 
@@ -313,35 +310,34 @@ function showFinalResult(isSkip = false) {
     const consent = document.getElementById('marketing-check').checked;
     const winner = matchedMonsters[currentCardIndex];
 
-    if(!winner) {
-        alert("ERROR: No entity data found. Returning to start.");
-        resetGame();
+    if (!winner) {
+        console.error("Dossier Error: No monster object found in memory.");
         return;
     }
 
     if (!isSkip) {
         if (!email.includes("@") || !consent) {
-            alert("ACCESS DENIED: Valid email and consent required for dossier decryption.");
+            alert("ACCESS DENIED: Valid email and consent required.");
             return;
         }
-
-        const payload = {
-            email: email,
-            monster: winner.name,
-            source: "MonsterMatchGame"
-        };
+        const payload = { email: email, monster: winner.name, source: "MonsterMatchGame" };
         window.parent.postMessage(payload, "*");
     }
 
+    const nameEl = document.getElementById('dossier-monster-name');
+    const speciesEl = document.getElementById('dossier-species');
+    const paraEl = document.getElementById('dossier-paragraph');
+
+    if (nameEl && speciesEl && paraEl) {
+        nameEl.innerText = winner.name;
+        speciesEl.innerText = `SPECIES: ${winner.species}`;
+        paraEl.innerText = winner.encounterText || "Dossier data corrupted. Re-initialize scan.";
+    }
+
     document.getElementById('email-wall').style.display = 'none';
+    document.getElementById('dossier-screen').style.display = 'block';
     
-    // POPULATE DOSSIER
-    document.getElementById('dossier-monster-name').innerText = winner.name;
-    document.getElementById('dossier-species').innerText = `SPECIES: ${winner.species}`;
-    document.getElementById('dossier-paragraph').innerText = winner.encounterText;
-    document.getElementById('dossier-screen').style.display = 'block'; 
-    
-    setTimeout(sendHeightToWix, 100);
+    setTimeout(sendHeightToWix, 150);
 }
 
 // Kick off
