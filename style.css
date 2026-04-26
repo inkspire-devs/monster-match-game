@@ -5,7 +5,7 @@
     --acid-gold: #d4ff00;
     --slate-grey: #2f4f4f;
     --alabaster-grey: #e7e7e7;
-    --hardware-bg: transparent;
+    --hardware-bg: #121212;
     
     --header-font: 'Archivo Black', 'Anton', sans-serif;
     --body-font: 'Inter', 'Public Sans', sans-serif;
@@ -14,12 +14,12 @@
 
 /* --- 2. GLOBAL LAYOUT --- */
 body {
-    background-color: var(--hardware-bg);
+    background-color: transparent !important;
     color: var(--alabaster-grey);
     font-family: var(--body-font);
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     min-height: 100vh;
     margin: 0;
 }
@@ -371,3 +371,55 @@ input[type="email"] {
 }
 
 button:active { transform: scale(0.98); }
+
+/* --- 8. MOBILE OPTIMIZATION --- */
+@media screen and (max-width: 480px) {
+    #game-container {
+        width: 95%; /* Use more of the screen width */
+        padding: 1.2rem; /* Reduce padding so content has room */
+        margin: 5px auto;
+    }
+
+    h2 {
+        font-size: 1.4rem; /* Smaller headers so they don't wrap weirdly */
+        margin-bottom: 1.5rem;
+    }
+
+    /* Stack the header grid for monsters */
+    .card-header-grid {
+        grid-template-columns: 1fr; /* Stack name above metadata */
+        text-align: center;
+        gap: 10px;
+    }
+
+    .header-right {
+        text-align: center;
+        align-items: center;
+    }
+
+    /* Make buttons larger for thumbs */
+    .tag-btn {
+        width: 100%; /* Full width tags are easier to tap on mobile */
+        padding: 14px;
+        font-size: 0.9rem;
+    }
+
+    .split-grid {
+        grid-template-columns: 1fr; /* Stack 'Looking For' and 'Expect' */
+        gap: 15px;
+    }
+
+    .swipe-btns {
+        flex-wrap: wrap; /* Allow buttons to wrap if they are too wide */
+    }
+
+    .swipe-btns button {
+        font-size: 0.75rem; /* Ensure 4 buttons fit side-by-side */
+        padding: 15px 2px;
+    }
+
+    input[type="email"] {
+        width: 100%; /* Full width email input */
+        box-sizing: border-box;
+    }
+}
