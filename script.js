@@ -53,6 +53,11 @@ let matchedMonsters = [];
 let currentCardIndex = 0;
 let currentPage = 0;
 
+function sendHeightToWix() {
+    const height = document.documentElement.scrollHeight;
+    window.parent.postMessage({ frameHeight: height }, "*");
+}
+
 // --- NAVIGATION & UI LOGIC ---
 function renderPage() {
     const container = document.getElementById('tag-clouds');
@@ -91,6 +96,7 @@ function renderPage() {
     navContainer.appendChild(resetBtn);
     navContainer.appendChild(actionBtn);
     container.appendChild(navContainer);
+    sendHeightToWix();
 }
 
 function renderStandardTags(round, container) {
@@ -281,6 +287,7 @@ function renderCard() {
             <p class="section-body">${m.profile["Warning"]}</p>
         </div>
     `;
+    sendHeightToWix();
 }
 
 function nextCard() {
@@ -291,6 +298,7 @@ function nextCard() {
 function triggerEmailWall() {
     document.getElementById('swipe-screen').style.display = 'none';
     document.getElementById('email-wall').style.display = 'block';
+    sendHeightToWix();
 }
 
 function showFinalResult(isSkip = false) {
@@ -321,6 +329,7 @@ function showFinalResult(isSkip = false) {
     document.getElementById('dossier-species').innerText = `SPECIES: ${winner.species}`;
     document.getElementById('dossier-paragraph').innerText = winner.encounterText;
     document.getElementById('dossier-screen').style.display = 'block';
+    sendHeightToWix();
 }
 
 function prevCard() {
