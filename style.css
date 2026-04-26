@@ -316,7 +316,6 @@ h2 { font-size: 1.8rem; margin-bottom: 2rem; }
 
 #back-btn {
     border: 1px solid var(--electronic-violet);
-    color: var(--electronic-violet);
 }
 
 #back-btn:hover {
