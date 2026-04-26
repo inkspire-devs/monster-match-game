@@ -1,78 +1,352 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>Monster Match</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Inter:wght@400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-</head>
-<body>
-    <div id="game-container">
+import { monsters } from './monsters.js';
+
+const rounds = [
+  {
+    category: "orientation",
+    title: "Looking for...",
+    options: [
+      { text: "Male-Presenting Entities", value: "Male" },
+      { text: "Female-Presenting Entities", value: "Female" },
+      { text: "Fluid / Non-Binary Entities", value: "Fluid" }
+    ]
+  },    
+  {
+    category: "setting",
+    title: "Where do you feel most at home?",
+    options: [
+      { text: "A rocky, shadowy mountain pass", value: "Mountain Pass" },   
+      { text: "A sparkling underwater kingdom", value: "Underwater Kingdom" },
+      { text: "An icy, frozen desert", value: "Frozen Tundra" },
+      { text: "A dark, whispering forest", value: "Dark Forest" },
+      { text: "A high-tech space station", value: "Space Station" },
+      { text: "A crumbling, endless labyrinth", value: "Ancient Labyrinth" },
+      { text: "A snow-dusted, windy mountain peak", value: "Mountain Peak" },
+      { text: "A drafty, haunted manor", value: "Haunted Manor" },
+      { text: "A scorching inferno", value: "7th Ring of Hell" },
+    ]
+  },
+  {
+    category: "taxonomy",
+    title: "What is your preferred taxonomic group?",
+    options: [
+      { text: "Group 1: Homo Monstra", value: "Group 1", desc: "Superficially human, biologically divergent." },
+      { text: "Group 2: Anthropica Aberrans", value: "Group 2", desc: "Humanoid with observable monstrous deviation." },
+      { text: "Group 3: Monstra-Anthropo Hybrida", value: "Group 3", desc: "Hybrid organisms with human and non-human parts." },
+      { text: "Group 4: Xenoforma Monstra", value: "Group 4", desc: "Fully non-human entities. No humanoid features." },
+      { text: "Group 5: Intuitus Incorporea", value: "Group 5", desc: "Incorporeal or metaphysical intelligences." }
+    ]
+  },
+  {
+    category: "passion",
+    title: "Define your wants on the Passion Meter",
+    options: [
+      { text: "Wholesome & Sweet", value: "Wholesome & Sweet" },
+      { text: "Blush Inducing", value: "Blush Inducing" },
+      { text: "Relentless Seduction", value: "Relentless Seduction" },
+      { text: "Unhinged", value: "Unhinged" }
+    ]
+  }
+];
+
+let selectedTags = [];
+let matchedMonsters = [];
+let currentCardIndex = 0;
+let currentPage = 0;
+
+function sendHeightToWix() {
+    const height = document.documentElement.scrollHeight + 40;
+    window.parent.postMessage({ frameHeight: height }, "*");
+}
+
+// --- NAVIGATION & UI LOGIC ---
+function renderPage() {
+    const container = document.getElementById('tag-clouds');
+    const title = document.querySelector('#setup-screen h2');
+    container.innerHTML = ""; 
+
+    const round = rounds[currentPage];
+    title.innerText = round.title;
+
+    if (round.category === "taxonomy") {
+        const subtitle = document.createElement('p');
+        subtitle.className = "page-subtitle";
+        subtitle.innerText = "Find more in-depth data on the released Field Compendium files (by signing up to the newsletter)";
+        container.appendChild(subtitle);
+    }
+
+    if (round.category === "passion") {
+        renderPassionMeter(round, container);
+    } else {
+        renderStandardTags(round, container);
+    }
+
+    const navContainer = document.createElement('div');
+    navContainer.className = "nav-btns";
+
+    const resetBtn = document.createElement('button');
+    resetBtn.innerText = "Reset";
+    resetBtn.className = "btn-no"; 
+    resetBtn.onclick = resetGame;
+
+    const actionBtn = document.createElement('button');
+    actionBtn.id = "find-monsters-btn";
+    actionBtn.innerText = currentPage < rounds.length - 1 ? "Next Step" : "Initialize Match";
+    actionBtn.onclick = nextPage;
+
+    navContainer.appendChild(resetBtn);
+    navContainer.appendChild(actionBtn);
+    container.appendChild(navContainer);
+    
+    setTimeout(sendHeightToWix, 100);
+}
+
+function renderStandardTags(round, container) {
+    round.options.forEach(opt => {
+        const wrapper = document.createElement('div');
+        wrapper.className = "tag-wrapper";
+        const isSelected = selectedTags.includes(opt.value);
+        const btn = document.createElement('button');
+        btn.className = `tag-btn ${isSelected ? 'selected' : ''}`;
+        btn.innerText = opt.text;
+        btn.onclick = () => toggleTag(opt.value, btn);
+        wrapper.appendChild(btn);
+        if (opt.desc) {
+            const d = document.createElement('p');
+            d.className = "tag-desc";
+            d.innerText = opt.desc;
+            wrapper.appendChild(d);
+        }
+        container.appendChild(wrapper);
+    });
+}
+
+function renderPassionMeter(round, container) {
+    const meterBox = document.createElement('div');
+    meterBox.className = "passion-meter-box";
+    round.options.forEach((opt, index) => {
+        const isSelected = selectedTags.includes(opt.value);
+        const level = document.createElement('div');
+        level.className = `meter-level ${isSelected ? 'selected' : ''}`;
+        const intensity = ((index + 1) / round.options.length) * 100;
+        level.innerHTML = `
+            <span class="meter-label">${opt.text}</span>
+            <div class="meter-bar" style="width: ${intensity}%"></div>
+        `;
+        level.onclick = () => toggleTag(opt.value, level);
+        meterBox.appendChild(level);
+    });
+    container.appendChild(meterBox);
+}
+
+function toggleTag(value, element) {
+    if (selectedTags.includes(value)) {
+        selectedTags = selectedTags.filter(t => t !== value);
+        element.classList.remove('selected');
+    } else {
+        selectedTags.push(value);
+        element.classList.add('selected');
+    }
+}
+
+function nextPage() {
+    if (currentPage < rounds.length - 1) {
+        currentPage++;
+        renderPage();
+    } else {
+        startSwiping();
+    }
+}
+
+function resetGame() {
+    currentPage = 0;
+    selectedTags = [];
+    matchedMonsters = [];
+    currentCardIndex = 0;
+    
+    document.getElementById('swipe-screen').style.display = 'none';
+    document.getElementById('email-wall').style.display = 'none';
+    document.getElementById('dossier-screen').style.display = 'none';
+    document.getElementById('setup-screen').style.display = 'block';
+    
+    renderPage();
+    setTimeout(sendHeightToWix, 100);
+}
+
+// --- GAME ENGINE ---
+function startSwiping() {
+    if (selectedTags.length === 0) {
+        alert("Please select at least one parameter to begin.");
+        return;
+    }
+
+    // 1. Identify which tags were selected for each specific category
+    const chosenOrientations = selectedTags.filter(tag => 
+        rounds[0].options.some(opt => opt.value === tag)
+    );
+    const chosenSettings = selectedTags.filter(tag => 
+        rounds[1].options.some(opt => opt.value === tag)
+    );
+    const chosenTaxonomy = selectedTags.filter(tag => 
+        rounds[2].options.some(opt => opt.value === tag)
+    );
+    const chosenPassions = selectedTags.filter(tag => 
+        rounds[3].options.some(opt => opt.value === tag)
+    );
+
+    // 2. The Multi-Step Filter (Strict Mode)
+    matchedMonsters = monsters.filter(m => {
+        // A. Orientation: If user picked specific ones, monster MUST match. Otherwise, allow all.
+        const matchesOrientation = chosenOrientations.length === 0 || chosenOrientations.includes(m.orientation);
         
-        <div id="setup-screen">
-            <h2>Monster Match</h2>
-            <div id="tag-clouds">
-                </div>
-        </div>
-
-        <div id="swipe-screen" style="display:none;">
-            <div id="match-counter" class="card-tier" style="margin-bottom: 10px;">MATCH: 0 / 0</div>
-
-            <div id="monster-card">
-                <img id="card-image" src="" alt="Monster Profile Image">
-                <div id="card-content"></div>
-                <div id="card-profile"></div>
-
-                <div class="swipe-btns">
-                    <button onclick="resetGame()" class="btn-no" id="redo-btn">Re-do</button>
-                    <button onclick="prevCard()" class="btn-no" id="back-btn">Back</button>
-                    <button onclick="nextCard()" class="btn-no">Pass</button>
-                    <button onclick="triggerEmailWall()" class="btn-yes">Connect</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="email-wall" style="display:none;" class="setup-container">
-            <h2>The Invitation has been sent.</h2>
-            <h2>Your monster is waiting for you.</h2>
-
-            <div class="lore-desc">
-                <span class="lore-header">Who we are</span>
-                <p>Escape the corporate algorithms and find your way to Lorekeeper's Hall. This is your cozy sanctuary for eBooks, a space where authors are actually rewarded and readers come first. Ditch the big-name stores for a reading refuge built on passion and indie voices.</p>
-            </div>
-                        
-            <input type="email" id="user-email" placeholder="your@email.com">
-            
-            <div class="legal">
-                <input type="checkbox" id="marketing-check"> 
-                <span>I agree to receive updates and news on Lorekeepers' Hall.</span>
-            </div>
-            
-            <button id="reveal-btn" onclick="showFinalResult()">Reveal My Fate</button>
-
-            <p style="margin-top: 15px; font-size: 0.7rem; opacity: 0.6;">
-                Already a signed? <a href="#" onclick="showFinalResult(true)" style="color: var(--acid-gold);">Decrypt results.</a>
-            </p>
-        </div>
-
-        <div id="dossier-screen" style="display: none;" class="setup-container">
-            <h2 style="color: red">ENCOUNTER LOG: CLASSIFIED</h2>
-            <hr>
-            <div id="dossier-content">
-                <h1 id="dossier-monster-name" style="margin-bottom: 5px;"></h1>
-                <p id="dossier-species" style="font-size: 0.8rem; opacity: 0.7; margin-bottom: 20px;"></p>
-                
-                <div class="dossier-text-box">
-                    <p id="dossier-paragraph"></p>
-                </div>
-            </div>
-            
-            <button class="tag-btn" onclick="resetGame()" style="margin-top: 30px;">RESTART</button>
-        </div>
+        // B. Setting: If user picked specific settings, monster MUST match. Otherwise, allow all.
+        const matchesSetting = chosenSettings.length === 0 || chosenSettings.includes(m.setting);
         
-    </div>
+        // C. Taxonomy: If user picked specific groups, monster MUST match. Otherwise, allow all.
+        const matchesTaxonomy = chosenTaxonomy.length === 0 || chosenTaxonomy.includes(m.taxonomy);
 
-    <script type="module" src="script.js"></script>
-</body>
-</html>
+        // D. Passion: If user picked specific passion levels, monster MUST match. Otherwise, allow all.
+        const matchesPassion = chosenPassions.length === 0 || chosenPassions.includes(m.passion);
+
+        // All active filters must be true for this monster to stay in the deck
+        return matchesOrientation && matchesSetting && matchesTaxonomy && matchesPassion;
+    });
+
+    // 3. Final Scoring (Sorting relevance)
+    matchedMonsters = matchedMonsters.map(m => {
+        let score = 0;
+        if (selectedTags.includes(m.setting)) score += 1;
+        if (selectedTags.includes(m.taxonomy)) score += 2; 
+        if (selectedTags.includes(m.passion)) score += 1;
+        return { ...m, score };
+    }).sort((a, b) => b.score - a.score);
+
+    // 4. Handle Empty Results
+    if (matchedMonsters.length === 0) {
+        alert("No entity matches that specific combination of parameters. Broaden your search.");
+        return; 
+    }
+
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('swipe-screen').style.display = 'block';
+    renderCard();
+}
+
+function renderCard() {
+    const m = matchedMonsters[currentCardIndex];
+    if(!m) return;
+
+    const counter = document.getElementById('match-counter');
+    counter.innerText = `RELEVANT ENTITIES: ${currentCardIndex + 1} / ${matchedMonsters.length}`;
+
+    const imageElement = document.getElementById('card-image');
+    imageElement.src = (!m.imageURL || m.imageURL.includes("path/to")) 
+        ? "https://via.placeholder.com/400x500.png?text=ENCOUNTER_ART_LOADING" 
+        : m.imageURL;
+
+    const taxonomyRound = rounds.find(r => r.category === "taxonomy");
+    const taxonomyOption = taxonomyRound.options.find(opt => opt.value === m.taxonomy);
+    const fullTaxonomyLabel = taxonomyOption ? taxonomyOption.text : m.taxonomy;
+
+    document.getElementById('card-content').innerHTML = `
+        <div class="card-header-grid">
+            <div class="header-left">
+                <h1>${m.name}</h1>
+                <p class="species-tag">${m.species}</p>
+            </div>
+            <div class="header-right">
+                <p class="card-group">[ DATA_SOURCE: ${fullTaxonomyLabel} | ${m.orientation} ]</p>
+                <p class="card-group">[ LOCATION: ${m.setting} ]</p>
+            </div>
+        </div>
+    `;
+
+    const profileContainer = document.getElementById('card-profile');
+    profileContainer.innerHTML = `
+        <div class="profile-section bio-box">
+            <h3 class="section-title">BIO</h3>
+            <p class="section-body bio-text">${m.profile["Bio"]}</p>
+        </div>
+        <div class="fact-intercept">
+            <h3 class="section-title">RANDOM FACT</h3>
+            <p class="section-body italic-text">"${m.profile["Random Fact"]}"</p>
+        </div>
+        <div class="split-grid">
+            <div class="profile-section">
+                <h3 class="section-title">LOOKING FOR</h3>
+                <ul class="bullet-list">${m.profile["Looking For"].split('. ').map(s => s ? `<li>${s}</li>` : '').join('')}</ul>
+            </div>
+            <div class="profile-section">
+                <h3 class="section-title">WHAT TO EXPECT</h3>
+                <ul class="bullet-list">${m.profile["What to Expect"].split('. ').map(s => s ? `<li>${s}</li>` : '').join('')}</ul>
+            </div>
+        </div>
+        <div class="warning-block">
+            <h3 class="section-title" style="color: red;">⚠️ WARNING</h3>
+            <p class="section-body">${m.profile["Warning"]}</p>
+        </div>
+    `;
+    setTimeout(sendHeightToWix, 150);
+}
+
+function nextCard() {
+    currentCardIndex = (currentCardIndex + 1) % matchedMonsters.length;
+    renderCard();
+}
+
+function prevCard() {
+    currentCardIndex = (currentCardIndex - 1 + matchedMonsters.length) % matchedMonsters.length;
+    renderCard();
+}
+
+function triggerEmailWall() {
+    document.getElementById('swipe-screen').style.display = 'none';
+    document.getElementById('email-wall').style.display = 'block';
+    setTimeout(sendHeightToWix, 100);
+}
+
+function showFinalResult(isSkip = false) {
+    const emailInput = document.getElementById('user-email');
+    const email = emailInput.value;
+    const consent = document.getElementById('marketing-check').checked;
+    const winner = matchedMonsters[currentCardIndex];
+
+    if (!winner) {
+        console.error("Dossier Error: No monster object found in memory.");
+        return;
+    }
+
+    if (!isSkip) {
+        if (!email.includes("@") || !consent) {
+            alert("ACCESS DENIED: Valid email and consent required.");
+            return;
+        }
+        const payload = { email: email, monster: winner.name, source: "MonsterMatchGame" };
+        window.parent.postMessage(payload, "*");
+    }
+
+    const nameEl = document.getElementById('dossier-monster-name');
+    const speciesEl = document.getElementById('dossier-species');
+    const paraEl = document.getElementById('dossier-paragraph');
+
+    if (nameEl && speciesEl && paraEl) {
+        nameEl.innerText = winner.name;
+        speciesEl.innerText = `SPECIES: ${winner.species}`;
+        paraEl.innerText = winner.encounterText || "Dossier data corrupted. Re-initialize scan.";
+    }
+
+    document.getElementById('email-wall').style.display = 'none';
+    document.getElementById('dossier-screen').style.display = 'block';
+    
+    setTimeout(sendHeightToWix, 150);
+}
+
+// Kick off
+renderPage();
+
+window.nextPage = nextPage;
+window.prevCard = prevCard;
+window.resetGame = resetGame;
+window.nextCard = nextCard;
+window.triggerEmailWall = triggerEmailWall;
+window.showFinalResult = showFinalResult;
+window.toggleTag = toggleTag;
