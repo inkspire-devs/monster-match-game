@@ -54,7 +54,8 @@ let currentCardIndex = 0;
 let currentPage = 0;
 
 function sendHeightToWix() {
-    const height = document.documentElement.scrollHeight;
+    // Adding a 40px buffer to ensure scrollbars never appear
+    const height = document.documentElement.scrollHeight + 40;
     window.parent.postMessage({ frameHeight: height }, "*");
 }
 
@@ -96,7 +97,9 @@ function renderPage() {
     navContainer.appendChild(resetBtn);
     navContainer.appendChild(actionBtn);
     container.appendChild(navContainer);
-    sendHeightToWix();
+    
+    // UI is rendered, sync height
+    setTimeout(sendHeightToWix, 100);
 }
 
 function renderStandardTags(round, container) {
@@ -161,11 +164,15 @@ function resetGame() {
     selectedTags = [];
     matchedMonsters = [];
     currentCardIndex = 0;
+    
+    // Reset all screens
     document.getElementById('swipe-screen').style.display = 'none';
     document.getElementById('email-wall').style.display = 'none';
-    document.getElementById('final-result').style.display = 'none';
+    document.getElementById('dossier-screen').style.display = 'none';
     document.getElementById('setup-screen').style.display = 'block';
+    
     renderPage();
+    setTimeout(sendHeightToWix, 100);
 }
 
 // --- GAME ENGINE ---
@@ -189,7 +196,7 @@ function startSwiping() {
         rounds[3].options.some(opt => opt.value === tag)
     );
 
-    // 2. The Multi-Step Filter
+    // 2. The Multi-Step Filter (Strict Mode)
     matchedMonsters = monsters.filter(m => {
         // A. Orientation: If user picked specific ones, monster MUST match. Otherwise, allow all.
         const matchesOrientation = chosenOrientations.length === 0 || chosenOrientations.includes(m.orientation);
@@ -207,7 +214,7 @@ function startSwiping() {
         return matchesOrientation && matchesSetting && matchesTaxonomy && matchesPassion;
     });
 
-    // 3. Final Scoring (for sorting relevance if they picked many tags)
+    // 3. Final Scoring (Sorting relevance)
     matchedMonsters = matchedMonsters.map(m => {
         let score = 0;
         if (selectedTags.includes(m.setting)) score += 1;
@@ -219,7 +226,7 @@ function startSwiping() {
     // 4. Handle Empty Results
     if (matchedMonsters.length === 0) {
         alert("DATABASE EMPTY: No entity matches that specific combination of parameters. Broaden your search.");
-        return; // Don't reset, just let them change their tags
+        return; 
     }
 
     document.getElementById('setup-screen').style.display = 'none';
@@ -229,18 +236,16 @@ function startSwiping() {
 
 function renderCard() {
     const m = matchedMonsters[currentCardIndex];
-    
-    // 1. Match Counter
+    if(!m) return;
+
     const counter = document.getElementById('match-counter');
     counter.innerText = `RELEVANT ENTITIES: ${currentCardIndex + 1} / ${matchedMonsters.length}`;
 
-    // 2. Image Handling
     const imageElement = document.getElementById('card-image');
     imageElement.src = (!m.imageURL || m.imageURL.includes("path/to")) 
         ? "https://via.placeholder.com/400x500.png?text=ENCOUNTER_ART_LOADING" 
         : m.imageURL;
 
-    // 3. Header Section (Grid: Name on Left, Metadata on Right)
     const taxonomyRound = rounds.find(r => r.category === "taxonomy");
     const taxonomyOption = taxonomyRound.options.find(opt => opt.value === m.taxonomy);
     const fullTaxonomyLabel = taxonomyOption ? taxonomyOption.text : m.taxonomy;
@@ -258,19 +263,16 @@ function renderCard() {
         </div>
     `;
 
-    // 4. Profile Sections (Dossier Layout)
     const profileContainer = document.getElementById('card-profile');
     profileContainer.innerHTML = `
         <div class="profile-section bio-box">
             <h3 class="section-title">BIO</h3>
             <p class="section-body bio-text">${m.profile["Bio"]}</p>
         </div>
-
         <div class="fact-intercept">
             <h3 class="section-title">RANDOM FACT</h3>
             <p class="section-body italic-text">"${m.profile["Random Fact"]}"</p>
         </div>
-
         <div class="split-grid">
             <div class="profile-section">
                 <h3 class="section-title">LOOKING FOR</h3>
@@ -281,13 +283,12 @@ function renderCard() {
                 <ul class="bullet-list">${m.profile["What to Expect"].split('. ').map(s => s ? `<li>${s}</li>` : '').join('')}</ul>
             </div>
         </div>
-
         <div class="warning-block">
             <h3 class="section-title" style="color: red;">⚠️ WARNING</h3>
             <p class="section-body">${m.profile["Warning"]}</p>
         </div>
     `;
-    sendHeightToWix();
+    setTimeout(sendHeightToWix, 150);
 }
 
 function nextCard() {
@@ -295,10 +296,15 @@ function nextCard() {
     renderCard();
 }
 
+function prevCard() {
+    currentCardIndex = (currentCardIndex - 1 + matchedMonsters.length) % matchedMonsters.length;
+    renderCard();
+}
+
 function triggerEmailWall() {
     document.getElementById('swipe-screen').style.display = 'none';
     document.getElementById('email-wall').style.display = 'block';
-    sendHeightToWix();
+    setTimeout(sendHeightToWix, 100);
 }
 
 function showFinalResult(isSkip = false) {
@@ -307,14 +313,18 @@ function showFinalResult(isSkip = false) {
     const consent = document.getElementById('marketing-check').checked;
     const winner = matchedMonsters[currentCardIndex];
 
-    // If it's NOT a skip, we validate the email
+    if(!winner) {
+        alert("ERROR: No entity data found. Returning to start.");
+        resetGame();
+        return;
+    }
+
     if (!isSkip) {
         if (!email.includes("@") || !consent) {
             alert("ACCESS DENIED: Valid email and consent required for dossier decryption.");
             return;
         }
 
-        // Send to Wix
         const payload = {
             email: email,
             monster: winner.name,
@@ -323,19 +333,15 @@ function showFinalResult(isSkip = false) {
         window.parent.postMessage(payload, "*");
     }
 
-    // UI Transition remains the same
     document.getElementById('email-wall').style.display = 'none';
+    
+    // POPULATE DOSSIER
     document.getElementById('dossier-monster-name').innerText = winner.name;
     document.getElementById('dossier-species').innerText = `SPECIES: ${winner.species}`;
     document.getElementById('dossier-paragraph').innerText = winner.encounterText;
-    document.getElementById('dossier-screen').style.display = 'none';
-    sendHeightToWix();
-}
-
-function prevCard() {
-    // This moves backward in the array, looping to the end if at the start
-    currentCardIndex = (currentCardIndex - 1 + matchedMonsters.length) % matchedMonsters.length;
-    renderCard();
+    document.getElementById('dossier-screen').style.display = 'block'; 
+    
+    setTimeout(sendHeightToWix, 100);
 }
 
 // Kick off
