@@ -36,10 +36,10 @@
         <div id="email-wall" style="display:none;" class="setup-container">
             <h2>The Invitation has been sent.</h2>
             <h2>Your monster is waiting for you.</h2>
-        
+
             <div class="lore-desc">
                 <span class="lore-header">Who we are</span>
-                <p>Escape the corporate algorithms and find your way to Lorekeeper's Hall. This is your cozy sanctuary for eBooks, a space where authors are actually rewarded and readers come first.</p>
+                <p>Escape the corporate algorithms and find your way to Lorekeeper's Hall. This is your sanctuary, a space where authors are actually rewarded and readers come first.</p>
                 
                 <div style="margin-top: 15px; text-align: left; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border-left: 3px solid var(--acid-gold);">
                     <p style="margin-bottom: 8px; font-weight: bold; color: var(--acid-gold);">Subscribe to the newsletter to stay in touch! We'll be looking for:</p>
@@ -49,23 +49,16 @@
                         <li>• Authors</li>
                     </ul>
                 </div>
-            </div>
-                    
-            <input type="email" id="user-email" placeholder="your@email.com">
+            </div>       
             
-            <div class="legal">
-                <input type="checkbox" id="marketing-check"> 
-                <span>I agree to receive updates and news on Lorekeepers' Hall.</span>
+            <div style="margin-top: 20px;">
+                <button onclick="openNewsletterPopup()" style="background: none; border: 1px solid var(--acid-gold); color: var(--acid-gold); padding: 8px 15px; cursor: pointer; font-size: 0.8rem; border-radius: 5px;">
+                    Subscribe here!
+                </button>
             </div>
             
             <button id="reveal-btn" onclick="showFinalResult()">Reveal My Fate</button>
-        
-            <div style="margin-top: 20px;">
-                <button onclick="openNewsletterPopup()" style="background: none; border: 1px solid var(--acid-gold); color: var(--acid-gold); padding: 8px 15px; cursor: pointer; font-size: 0.8rem; border-radius: 5px;">
-                    Join the Inner Circle (Newsletter Only)
-                </button>
-            </div>
-        
+
             <p style="margin-top: 15px; font-size: 0.7rem; opacity: 0.6;">
                 Already signed up? <a href="#" onclick="showFinalResult(true)" style="color: var(--acid-gold);">Decrypt results.</a>
             </p>
