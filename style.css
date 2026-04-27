@@ -27,7 +27,7 @@ body {
 #game-container {
     background: var(--dark-spruce);
     padding: 2.5rem;
-    border-radius: 4px; /* Brutalist sharp corners */
+    border-radius: 4px;
     border: 2px solid var(--electronic-violet);
     text-align: center;
     box-shadow: 0 0 30px rgba(0,0,0,0.8);
@@ -56,7 +56,6 @@ h2 { font-size: 1.8rem; margin-bottom: 2rem; }
     text-align: left;
 }
 
-/* Intelligence Field Data Text */
 .tag-desc {
     font-family: var(--data-font);
     font-size: 0.85rem;
@@ -69,7 +68,7 @@ h2 { font-size: 1.8rem; margin-bottom: 2rem; }
     text-align: left;
 }
 
-/* --- 4. INTERACTIVE COMPONENTS (Buttons/Meter) --- */
+/* --- 4. INTERACTIVE COMPONENTS --- */
 .tag-btn {
     font-family: var(--data-font);
     text-transform: uppercase;
@@ -130,10 +129,6 @@ h2 { font-size: 1.8rem; margin-bottom: 2rem; }
     transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.meter-level.selected .meter-bar {
-    opacity: 0.5;
-}
-
 /* --- 5. NAVIGATION & CTAs --- */
 .nav-btns {
     display: flex;
@@ -151,7 +146,6 @@ h2 { font-size: 1.8rem; margin-bottom: 2rem; }
     transition: 0.2s;
 }
 
-/* Main CTA - Acid Gold */
 #find-monsters-btn, #reveal-btn {
     background: var(--acid-gold);
     color: black;
@@ -159,19 +153,15 @@ h2 { font-size: 1.8rem; margin-bottom: 2rem; }
     border: 2px solid var(--acid-gold);
 }
 
-#find-monsters-btn:hover {
+#find-monsters-btn:hover, #reveal-btn:hover {
     background: transparent;
     color: var(--acid-gold);
 }
 
-/* Standard Nav Buttons */
 .btn-yes { background: var(--electronic-violet); color: white; }
 .btn-no { background: transparent; color: var(--alabaster-grey); border: 1px solid var(--slate-grey); }
 
-.nav-btns .btn-no { flex: 1; }
-.nav-btns #find-monsters-btn { flex: 2; }
-
-/* --- 6. MONSTER CARD & PROFILE UI --- */
+/* --- 6. MONSTER CARD & DOSSIER UI --- */
 #match-counter {
     font-family: var(--data-font);
     color: var(--acid-gold);
@@ -182,7 +172,6 @@ h2 { font-size: 1.8rem; margin-bottom: 2rem; }
     text-align: right;
 }
 
-/* Header Grid Layout */
 .card-header-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -199,11 +188,6 @@ h2 { font-size: 1.8rem; margin-bottom: 2rem; }
     justify-content: flex-end;    
 }
 
-.header-right .card-group {
-    font-size: 0.6rem;
-}
-
-/* Dossier Blocks */
 .fact-intercept {
     background: rgba(138, 43, 226, 0.1);
     border: 1px dashed var(--electronic-violet);
@@ -220,7 +204,6 @@ h2 { font-size: 1.8rem; margin-bottom: 2rem; }
     text-align: left;
 }
 
-/* Split Grid for Bullets */
 .split-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -237,12 +220,6 @@ h2 { font-size: 1.8rem; margin-bottom: 2rem; }
     line-height: 1.4;
 }
 
-.bullet-list li {
-    margin-bottom: 8px;
-    position: relative;
-    padding-left: 15px;
-}
-
 .bullet-list li::before {
     content: ">";
     position: absolute;
@@ -251,15 +228,9 @@ h2 { font-size: 1.8rem; margin-bottom: 2rem; }
     font-family: var(--data-font);
 }
 
-.italic-text {
-    font-style: italic;
-    color: var(--alabaster-grey);
-}
-
 #card-image {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
     border: 2px solid var(--slate-grey);
     margin-bottom: 20px;
 }
@@ -274,98 +245,42 @@ h2 { font-size: 1.8rem; margin-bottom: 2rem; }
     text-align: left;
 }
 
-#card-profile { /* Matches your script.js ID */
+#card-profile {
     text-align: left;
     margin-top: 25px;
     padding-top: 20px;
     border-top: 1px solid var(--slate-grey);
 }
 
-.profile-section { /* Matches your script.js class */
+.profile-section {
     margin-bottom: 20px;
     padding-left: 10px;
     border-left: 2px solid var(--electronic-violet);
 }
 
-.profile-section h3 {
-    font-family: var(--data-font);
-    font-size: 0.8rem;
-    opacity: 0.7;
-    margin: 0 0 5px 0;
-}
-
-.profile-section p {
-    font-family: var(--body-font);
-    font-size: 0.95rem;
-    margin: 0;
-    line-height: 1.4;
-}
-
 .swipe-btns {
     display: flex;
-    justify-content: space-between; /* Spreads buttons evenly */
+    justify-content: space-between;
     gap: 10px;
     margin-top: 25px;
 }
 
 .swipe-btns button {
-    flex: 1; /* Makes all three buttons equal width */
-    font-size: 0.8rem; /* Slightly smaller text to ensure they fit on mobile */
+    flex: 1;
+    font-size: 0.8rem;
     padding: 12px 5px;
 }
 
-#back-btn {
-    border: 1px solid var(--electronic-violet);
-}
-
-#back-btn:hover {
-    background: rgba(138, 43, 226, 0.1);
-}
-
-/* --- 7. FORMS & UTILITY --- */
-.lore-desc {
-    font-size: 0.85rem;
-    line-height: 1.4;
-    font-style: italic;
-    color: var(--alabaster-grey);
-    background: rgba(193, 161, 101, 0.1); 
-    padding: 10px;
-    border-radius: 4px;
-    margin-bottom: 20px;
-    border: 1px solid rgba(193, 161, 101, 0.2);
-}
-
+/* --- 7. DOSSIER & TRANSITION SCREEN --- */
 .lore-header {
     display: block;
-    font-family: var(--header-font); 
+    font-family: var(--header-font);
     font-size: 0.9rem;
     text-transform: uppercase;
     text-decoration: underline;
     text-underline-offset: 4px;
     margin-bottom: 10px;
     color: var(--acid-gold);
-}
-
-input[type="email"] {
-    font-family: var(--data-font);
-    width: 85%;
-    padding: 14px;
-    background: rgba(0,0,0,0.5);
-    border: 1px solid var(--slate-grey);
-    color: var(--acid-gold);
-    margin-bottom: 15px;
-}
-
-.legal {
-    font-family: var(--data-font);
-    font-size: 0.7rem;
-    color: var(--alabaster-grey);
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 15px;
 }
 
 .dossier-text-box {
@@ -375,7 +290,7 @@ input[type="email"] {
     margin: 15px 0;
     text-align: left;
     line-height: 1.6;
-    font-family: 'Courier New', Courier, monospace; 
+    font-family: var(--data-font);
     font-size: 0.9rem;
     color: var(--alabaster-grey);
 }
@@ -385,21 +300,19 @@ button:active { transform: scale(0.98); }
 /* --- 8. MOBILE OPTIMIZATION --- */
 @media screen and (max-width: 480px) {
     #game-container {
-        width: 95%; 
-        padding: 1.2rem; 
+        width: 95%;
+        padding: 1.2rem;
         margin: 5px auto;
     }
 
     h2 {
-        font-size: 1.4rem; 
+        font-size: 1.4rem;
         margin-bottom: 1.5rem;
     }
 
-    /* Stack the header grid for monsters */
     .card-header-grid {
-        grid-template-columns: 1fr; 
+        grid-template-columns: 1fr;
         text-align: center;
-        gap: 10px;
     }
 
     .header-right {
@@ -407,29 +320,17 @@ button:active { transform: scale(0.98); }
         align-items: center;
     }
 
-    /* Make buttons larger for thumbs */
     .tag-btn {
         width: 100%;
         padding: 14px;
-        font-size: 0.9rem;
     }
 
     .split-grid {
-        grid-template-columns: 1fr; 
-        gap: 15px;
-    }
-
-    .swipe-btns {
-        flex-wrap: wrap;
+        grid-template-columns: 1fr;
     }
 
     .swipe-btns button {
-        font-size: 0.75rem; 
+        font-size: 0.7rem;
         padding: 15px 2px;
-    }
-
-    input[type="email"] {
-        width: 100%;
-        box-sizing: border-box;
     }
 }
