@@ -58,6 +58,12 @@ function sendHeightToWix() {
     window.parent.postMessage({ frameHeight: height }, "*");
 }
 
+// --- NEW: POPUP LOGIC ---
+function openNewsletterPopup() {
+    // Sends signal to Wix to open the Lightbox named "Newsletter"
+    window.parent.postMessage("OPEN_NEWSLETTER", "*");
+}
+
 // --- NAVIGATION & UI LOGIC ---
 function renderPage() {
     const container = document.getElementById('tag-clouds');
@@ -149,6 +155,7 @@ function toggleTag(value, element) {
 }
 
 function nextPage() {
+    // Force Wix to scroll to top every time we change questions
     window.parent.postMessage("SCROLL_TOP", "*");
 
     if (currentPage < rounds.length - 1) {
@@ -181,7 +188,6 @@ function startSwiping() {
         return;
     }
 
-    // 1. Identify which tags were selected for each specific category
     const chosenOrientations = selectedTags.filter(tag => 
         rounds[0].options.some(opt => opt.value === tag)
     );
@@ -195,25 +201,14 @@ function startSwiping() {
         rounds[3].options.some(opt => opt.value === tag)
     );
 
-    // 2. The Multi-Step Filter (Strict Mode)
     matchedMonsters = monsters.filter(m => {
-        // A. Orientation: If user picked specific ones, monster MUST match. Otherwise, allow all.
         const matchesOrientation = chosenOrientations.length === 0 || chosenOrientations.includes(m.orientation);
-        
-        // B. Setting: If user picked specific settings, monster MUST match. Otherwise, allow all.
         const matchesSetting = chosenSettings.length === 0 || chosenSettings.includes(m.setting);
-        
-        // C. Taxonomy: If user picked specific groups, monster MUST match. Otherwise, allow all.
         const matchesTaxonomy = chosenTaxonomy.length === 0 || chosenTaxonomy.includes(m.taxonomy);
-
-        // D. Passion: If user picked specific passion levels, monster MUST match. Otherwise, allow all.
         const matchesPassion = chosenPassions.length === 0 || chosenPassions.includes(m.passion);
-
-        // All active filters must be true for this monster to stay in the deck
         return matchesOrientation && matchesSetting && matchesTaxonomy && matchesPassion;
     });
 
-    // 3. Final Scoring (Sorting relevance)
     matchedMonsters = matchedMonsters.map(m => {
         let score = 0;
         if (selectedTags.includes(m.setting)) score += 1;
@@ -222,14 +217,16 @@ function startSwiping() {
         return { ...m, score };
     }).sort((a, b) => b.score - a.score);
 
-    // 4. Handle Empty Results
     if (matchedMonsters.length === 0) {
-        alert("No entity matches that specific combination of parameters. Broaden your search.");
+        alert("No entity matches that specific combination. Broaden your search.");
         return; 
     }
 
     document.getElementById('setup-screen').style.display = 'none';
     document.getElementById('swipe-screen').style.display = 'block';
+    
+    // Jump to top of card view
+    window.parent.postMessage("SCROLL_TOP", "*");
     renderCard();
 }
 
@@ -291,16 +288,19 @@ function renderCard() {
 }
 
 function nextCard() {
+    window.parent.postMessage("SCROLL_TOP", "*");
     currentCardIndex = (currentCardIndex + 1) % matchedMonsters.length;
     renderCard();
 }
 
 function prevCard() {
+    window.parent.postMessage("SCROLL_TOP", "*");
     currentCardIndex = (currentCardIndex - 1 + matchedMonsters.length) % matchedMonsters.length;
     renderCard();
 }
 
 function triggerEmailWall() {
+    window.parent.postMessage("SCROLL_TOP", "*");
     document.getElementById('swipe-screen').style.display = 'none';
     document.getElementById('email-wall').style.display = 'block';
     setTimeout(sendHeightToWix, 100);
@@ -312,16 +312,14 @@ function showFinalResult(isSkip = false) {
     const consent = document.getElementById('marketing-check').checked;
     const winner = matchedMonsters[currentCardIndex];
 
-    if (!winner) {
-        console.error("Dossier Error: No monster object found in memory.");
-        return;
-    }
+    if (!winner) return;
 
     if (!isSkip) {
         if (!email.includes("@") || !consent) {
             alert("ACCESS DENIED: Valid email and consent required.");
             return;
         }
+        // Send actual data to Wix
         const payload = { email: email, monster: winner.name, source: "MonsterMatchGame" };
         window.parent.postMessage(payload, "*");
     }
@@ -333,11 +331,12 @@ function showFinalResult(isSkip = false) {
     if (nameEl && speciesEl && paraEl) {
         nameEl.innerText = winner.name;
         speciesEl.innerText = `SPECIES: ${winner.species}`;
-        paraEl.innerText = winner.encounterText || "Dossier data corrupted. Re-initialize scan.";
+        paraEl.innerText = winner.encounterText || "Dossier data corrupted.";
     }
 
     document.getElementById('email-wall').style.display = 'none';
     document.getElementById('dossier-screen').style.display = 'block';
+    window.parent.postMessage("SCROLL_TOP", "*");
     
     setTimeout(sendHeightToWix, 150);
 }
@@ -345,6 +344,7 @@ function showFinalResult(isSkip = false) {
 // Kick off
 renderPage();
 
+// Export to Global Scope for HTML onclicks
 window.nextPage = nextPage;
 window.prevCard = prevCard;
 window.resetGame = resetGame;
@@ -352,3 +352,4 @@ window.nextCard = nextCard;
 window.triggerEmailWall = triggerEmailWall;
 window.showFinalResult = showFinalResult;
 window.toggleTag = toggleTag;
+window.openNewsletterPopup = openNewsletterPopup;
