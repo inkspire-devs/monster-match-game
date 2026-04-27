@@ -216,15 +216,21 @@ h2 { font-size: 1.8rem; margin-bottom: 2rem; }
 .bullet-list {
     list-style: none;
     padding: 0;
-    margin: 10px 0 0 0;
+    margin: 10px 0 0 5px; /* Added 5px left margin */
     font-size: 0.85rem;
     line-height: 1.4;
+}
+
+.bullet-list li {
+    margin-bottom: 8px;
+    position: relative;
+    padding-left: 20px; /* Increased from 15px to 20px */
 }
 
 .bullet-list li::before {
     content: ">";
     position: absolute;
-    left: 0;
+    left: 0; /* This now stays inside the li's padding */
     color: var(--electronic-violet);
     font-family: var(--data-font);
 }
@@ -255,7 +261,7 @@ h2 { font-size: 1.8rem; margin-bottom: 2rem; }
 
 .profile-section {
     margin-bottom: 20px;
-    padding-left: 10px;
+    padding-left: 20px; /* Increased from 10px to 20px */
     border-left: 2px solid var(--electronic-violet);
 }
 
