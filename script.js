@@ -307,22 +307,16 @@ function triggerEmailWall() {
 }
 
 function showFinalResult(isSkip = false) {
-    const emailInput = document.getElementById('user-email');
-    const email = emailInput.value;
-    const consent = document.getElementById('marketing-check').checked;
     const winner = matchedMonsters[currentCardIndex];
 
-    if (!winner) return;
-
-    if (!isSkip) {
-        if (!email.includes("@") || !consent) {
-            alert("ACCESS DENIED: Valid email and consent required.");
-            return;
-        }
-        // Send actual data to Wix
-        const payload = { email: email, monster: winner.name, source: "MonsterMatchGame" };
-        window.parent.postMessage(payload, "*");
+    if (!winner) {
+        console.error("Dossier Error: No monster object found in memory.");
+        return;
     }
+
+    // Since we aren't collecting email/consent here anymore, 
+    // we simply trigger the scroll and display the result.
+    window.parent.postMessage("SCROLL_TOP", "*");
 
     const nameEl = document.getElementById('dossier-monster-name');
     const speciesEl = document.getElementById('dossier-species');
@@ -331,13 +325,14 @@ function showFinalResult(isSkip = false) {
     if (nameEl && speciesEl && paraEl) {
         nameEl.innerText = winner.name;
         speciesEl.innerText = `SPECIES: ${winner.species}`;
-        paraEl.innerText = winner.encounterText || "Dossier data corrupted.";
+        paraEl.innerText = winner.encounterText || "Dossier data corrupted. Re-initialize scan.";
     }
 
+    // UI Transition
     document.getElementById('email-wall').style.display = 'none';
     document.getElementById('dossier-screen').style.display = 'block';
-    window.parent.postMessage("SCROLL_TOP", "*");
     
+    // Ensure the new screen starts at the top
     setTimeout(sendHeightToWix, 150);
 }
 
