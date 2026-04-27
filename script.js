@@ -149,6 +149,8 @@ function toggleTag(value, element) {
 }
 
 function nextPage() {
+    window.parent.postMessage("SCROLL_TOP", "*");
+
     if (currentPage < rounds.length - 1) {
         currentPage++;
         renderPage();
