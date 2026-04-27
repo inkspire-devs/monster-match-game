@@ -151,6 +151,7 @@ h2 { font-size: 1.8rem; margin-bottom: 2rem; }
     color: black;
     width: 100%;
     border: 2px solid var(--acid-gold);
+    margin-top: 10px;
 }
 
 #find-monsters-btn:hover, #reveal-btn:hover {
